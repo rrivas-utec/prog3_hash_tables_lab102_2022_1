@@ -10,7 +10,7 @@
 #include <optional>
 
 // Template de hash
-template <typename T>
+template<typename T>
 size_t hash_function(T key, size_t m) {
     std::hash<T> pre_hash_fun;
     auto numeric_key = pre_hash_fun(key);
@@ -18,30 +18,32 @@ size_t hash_function(T key, size_t m) {
 }
 
 // Template de Alias de tipos
-template <typename KeyType, typename ValueType>
+template<typename KeyType, typename ValueType>
 using item_t = std::pair<KeyType, ValueType>;
 
-template <typename KeyType, typename ValueType>
+template<typename KeyType, typename ValueType>
 using chain_t = std::forward_list<item_t<KeyType, ValueType>>;
 
-template <typename KeyType, typename ValueType>
+template<typename KeyType, typename ValueType>
 class close_hash_table {
     size_t m = 0;
-    chain_t<KeyType, ValueType>* table {};
+    chain_t<KeyType, ValueType> *table{};
 public:
-    close_hash_table(size_t m): m(m) {
+    close_hash_table(size_t m) : m(m) {
         table = new chain_t<KeyType, ValueType>[m];
     }
+
     // Constructor copia
-    close_hash_table(const close_hash_table<KeyType, ValueType>& other)
-        : m(other.m) {
+    close_hash_table(const close_hash_table<KeyType, ValueType> &other)
+            : m(other.m) {
         table = new chain_t<KeyType, ValueType>[m];
         copy(other.table, other.table + m, table);
     }
+
     // Operador asignación copia
-    close_hash_table<KeyType, ValueType>& operator= (const close_hash_table<KeyType, ValueType>& other) {
+    close_hash_table<KeyType, ValueType> &operator=(const close_hash_table<KeyType, ValueType> &other) {
         if (&other == this) return *this;
-        delete [] table;
+        delete[] table;
         m = other.m;
         table = new chain_t<KeyType, ValueType>[m];
         copy(other.table, other.table + m, table);
@@ -50,16 +52,16 @@ public:
 
 
     // Solo funciona en escritura (variable)
-    bool insert(const item_t<KeyType, ValueType>& item) {
+    bool insert(const item_t<KeyType, ValueType> &item) {
         // Indice del slot
         auto index_slot = hash_function(item.first, m);
         // La cadena dentro del slot
-        auto& chain = table[index_slot];
+        auto &chain = table[index_slot];
         // Busca el key dentro de la cadena
         auto it = find_if(begin(chain), end(chain),
-        [item](auto current) {
-           return item.first == current.first;
-        });
+                          [item](auto current) {
+                              return item.first == current.first;
+                          });
         // Si lo ha encontrado retorna false y no hace nada
         if (it != end(chain)) return false;
         // Sino lo ha encontrado entonces lo inserta
@@ -67,50 +69,35 @@ public:
         return true;
     }
 
-    std::optional<item_t<KeyType, ValueType>&> find(const KeyType& key) {
+    std::pair<item_t<KeyType, ValueType>*, bool> find(const KeyType &key) {
         // Indice del slot
         auto index_slot = hash_function(key, m);
         // La cadena dentro del slot
-        auto& chain = table[index_slot];
+        auto &chain = table[index_slot];
         // Busca el key dentro de la cadena
         auto it = find_if(begin(chain), end(chain),
                           [key](auto current) {
                               return key == current.first;
                           });
-        // Si no lo encuentra
-        if (it == end(chain)) return std::nullopt;
-        return *it;
+        if (it != end(chain)) {
+            return {&(*it), true};
+        }
+        return {nullptr, false};
     }
 
-    std::optional<item_t<KeyType, ValueType>> find(const KeyType& key) const {
+    bool remove(const KeyType &key) {
         // Indice del slot
         auto index_slot = hash_function(key, m);
         // La cadena dentro del slot
-        auto& chain = table[index_slot];
-        // Busca el key dentro de la cadena
-        auto it = find_if(begin(chain), end(chain),
-                          [key](auto current) {
-                              return key == current.first;
-                          });
-        // Si no lo encuentra
-        if (it == end(chain)) return std::nullopt;
-        return *it;
-    }
-
-    void remove(const KeyType& key) {
-        // Indice del slot
-        auto index_slot = hash_function(key, m);
-        // La cadena dentro del slot
-        auto& chain = table[index_slot];
+        auto &chain = table[index_slot];
         // Remuevo el valor
         auto it = chain.remove_if(
                 [key](auto current) {
-                   return key = current.first;
+                    return key == current.first;
                 });
+        return it != end(chain);
     }
 };
-
-
 
 
 #endif //PROG3_HASH_TABLES_LAB102_2022_1_CHASH_H
