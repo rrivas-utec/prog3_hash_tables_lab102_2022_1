@@ -1,7 +1,7 @@
 #include <iostream>
-#include <functional>
 #include <string>
 #include "chash.h"
+#include "ohash.h"
 
 using namespace std;
 
@@ -21,28 +21,78 @@ void ejemplo_funciones_hash() {
     cout << hash_char_fun('B') << endl;
 }
 
-int main() {
-    ejemplo_funciones_hash();
-    close_hash_table<string, int> ht(10);
-    ht.insert({"A", 1});
-    ht.insert({"B", 2});
-    ht.insert({"C", 3});
-
-    auto [item, found] = ht.find("A");
-    if (found)
-        std::cout << item->second << std::endl;
+void ejemplo_close_hash() {
+    close_hash_table<string, int> ch(10);
+    auto result = ch.insert({"A", 1});
+    if (result.second)
+        cout << "Valor Ingresado: {" << result.first->first << ", " << result.first->second << "}\n";
     else
-        std::cout << "Not Found\n";
+        cout << "No ingresado\n";
 
-    auto removed = ht.remove("A");
+    result =  ch.insert({"A", 20});
+    if (result.second)
+        cout << "Valor Ingresado: {" << result.first->first << ", " << result.first->second << "}\n";
+    else
+        cout << "No ingresado\n";
+
+    ch.insert({"B", 2});
+    ch.insert({"C", 3});
+
+    result = ch.find("A");
+    if (result.second)
+        cout << "Valor Encontrado: {" << result.first->first << ", " << result.first->second << "}\n";
+    else
+        std::cout << "No encontrado\n";
+
+    auto removed = ch.remove("A");
     if (removed)
         std::cout << "Removido\n";
 
-    auto [item2, found2] = ht.find("A");
-    if (found2)
-        std::cout << item->second << std::endl;
+    result = ch.find("A");
+    if (result.second)
+        cout << "Valor Encontrado: {" << result.first->first << ", " << result.first->second << "}\n";
     else
-        std::cout << "Not Found\n";
+        std::cout << "No encontrado\n";
+}
 
+void ejemplo_open_hash() {
+    close_hash_table<string, int> oh(10);
+    auto result = oh.insert({"A", 1});
+    if (result.second)
+        cout << "Valor Ingresado: {" << result.first->first << ", " << result.first->second << "}\n";
+    else
+        cout << "No ingresado\n";
+
+    result =  oh.insert({"A", 20});
+    if (result.second)
+        cout << "Valor Ingresado: {" << result.first->first << ", " << result.first->second << "}\n";
+    else
+        cout << "No ingresado\n";
+
+    oh.insert({"B", 2});
+    oh.insert({"C", 3});
+
+    result = oh.find("A");
+    if (result.second)
+        cout << "Valor Encontrado: {" << result.first->first << ", " << result.first->second << "}\n";
+    else
+        std::cout << "No encontrado\n";
+
+    auto removed = oh.remove("A");
+    if (removed)
+        std::cout << "Removido\n";
+
+    result = oh.find("A");
+    if (result.second)
+        cout << "Valor Encontrado: {" << result.first->first << ", " << result.first->second << "}\n";
+    else
+        std::cout << "No encontrado\n";
+}
+
+int main() {
+//    ejemplo_funciones_hash();
+    ejemplo_close_hash();
+    cout << "-------\n";
+    ejemplo_close_hash();
     return 0;
 }
