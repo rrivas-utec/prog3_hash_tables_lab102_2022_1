@@ -6,7 +6,6 @@
 using namespace std;
 
 void ejemplo_funciones_hash() {
-
     hash<string> hash_string_fun;
     hash<bool> hash_bool_fun;
     hash<char> hash_char_fun;
